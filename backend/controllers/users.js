@@ -4,14 +4,12 @@ const User = require('../models/user');
 
 const RequestError = require('../errors/RequestError');
 const NotFoundError = require('../errors/NotFoundError');
-const UnauthorizedError = require('../errors/UnauthorizedError');
 const ConflictRequestError = require('../errors/ConflictRequestError');
 const {
   OK_STATUS,
   CREATED_STATUS,
   MESSAGE_REQUEST_ERROR,
   MESSAGE_NOT_FOUND_ERROR,
-  MESSAGE_UNAUTHORIZED_ERROR,
   MESSAGE_CONFLICT_REQUEST_ERROR,
 } = require('../utils/constants');
 
@@ -120,11 +118,8 @@ const login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (user) {
-        const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-        return res.send({ token });
-      }
-      throw new UnauthorizedError(MESSAGE_UNAUTHORIZED_ERROR);
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      return res.send({ token });
     })
     .catch(next);
 };
